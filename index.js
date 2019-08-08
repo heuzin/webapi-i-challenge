@@ -11,22 +11,28 @@ server.use(express.json());
 server.post('/api/users', (req, res) => {
     const newUser = req.body;
 
-    db.insert(newUser)
-        .then((name, bio) => {
-            if (name && bio) {
-                res.status(201).json(name);
-            } else {
-                res.status(404).json({
-                    message: "Please provide name and bio for the user."
-                })
-            }
-        })
-        .catch(err => {
-            res.status(500).json({
-                    err: err,
-                    message: "There was an error while saving the user to the database"
+    if (!newUser.name || !newUser.bio) {
+            res.status(404).json({
+                message: "Please provide name and bio for the user."
+            })
+    } else {
+        db.insert(newUser)
+        .then((name) => {
+                if (name) {
+                    res.status(201).json(name);
+                } else {
+                    res.status(404).json({
+                        message: "Please provide name and bio for the user."
+                    })
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                        err: err,
+                        message: "There was an error while saving the user to the database"
+                });
             });
-        });
+    }
 })
 
 server.get('/api/users', (req, res) => {
